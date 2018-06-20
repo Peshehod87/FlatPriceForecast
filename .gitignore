@@ -1,0 +1,6 @@
+# Build results
+*.log
+env/
+__pycache__
+settings.py
+*.json
