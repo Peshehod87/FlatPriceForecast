@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from scrapy.selector import Selector
-from scrapy.contrib.spiders import CrawlSpider, Rule
+from scrapy.spiders import CrawlSpider, Rule
 #from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.http import Request
 from CianCrawler.items import FlatItem
@@ -8,7 +8,7 @@ from CianCrawler.items import FlatItem
 class CianSpider(CrawlSpider):
     name = 'Cian'
     allowed_domains = ['https://www.cian.ru']
-    start_urls = ['https://www.cian.ru/cat.php?deal_type=sale&engine_version=2&offer_type=flat&region=1&p=2']
+    start_urls = ['https://www.cian.ru/cat.php?deal_type=sale&engine_version=2&offer_type=flat&region=1&p=3']
     #rules = (
     # The following rule is for pagination
     #Rule(SgmlLinkExtractor(allow=(r'\?p=\d+$'),), follow=True))
@@ -26,6 +26,10 @@ class CianSpider(CrawlSpider):
             item = FlatItem()
             item['address'] = flat.xpath("@address").extract() #possible it should be AddressItem
             item['underground'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_metro"]/a/text()').extract()
+            item['city'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_addr"][1]/a/text()').extract()
+            item['district'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_addr"][2]/a/text()').extract()
+            item['street'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_addr"][3]/a/text()').extract()
+            item['house'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_addr"][4]/a/text()').extract()
             #should be parsed in two: remoteness and remotenessType
             item['remoteness'] = flat.xpath('td[@class="objects_item_info_col_1"]//div[@class="objects_item_metro"]/span[@class="objects_item_metro_comment"]/text()').extract()
             item['objectType'] = flat.xpath('td[@class="objects_item_info_col_2"]/div/a/text()').extract()

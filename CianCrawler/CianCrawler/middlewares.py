@@ -6,7 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from w3lib.http import basic_auth_header
 
+import CianCrawler.auth as Auth
 
 class CiancrawlerSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -78,7 +80,8 @@ class CiancrawlerDownloaderMiddleware(object):
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        return None
+        request.meta['proxy'] = Auth.PROXY
+        request.headers['Proxy-Authorization'] = basic_auth_header(Auth.PROXY_USERNAME, Auth.PROXY_PASSWORD)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
@@ -101,3 +104,9 @@ class CiancrawlerDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+# class CianProxyMiddleware(object):
+#    def process_request(self, request, spider):
+#        request.meta['proxy'] = auth.PROXY
+#        request.headers['Proxy-Authorization'] = basic_auth_header(
+#            auth.PROXY_USERNAME, auth.PROXY_PASSWORD)
