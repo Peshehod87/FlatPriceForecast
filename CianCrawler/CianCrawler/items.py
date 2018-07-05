@@ -20,7 +20,9 @@ class FlatItem(Item):
     house = Field()
 
     objectType = Field()
-    square = Field()
+    squareTotal = Field()
+    squareLive = Field()
+    squareKitchen = Field()
     price = Field(input_processor=MapCompose(lambda str: re.sub('р\.','',str.strip())))
     floor = Field(input_processor=MapCompose(lambda str: re.sub('\s+',' ',str.strip())))
     description = Field(input_processor=MapCompose(lambda str: re.sub('\s+',' ',str.strip())))

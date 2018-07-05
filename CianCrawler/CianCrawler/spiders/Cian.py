@@ -19,11 +19,11 @@ class FlatLoader(XPathItemLoader):
 class CianSpider(CrawlSpider):
     name = 'Cian'
     allowed_domains = ['www.cian.ru']
-    start_urls = ['https://www.cian.ru/cat.php?deal_type=sale&engine_version=2&offer_type=flat&region=1']
+    start_urls = ['https://www.cian.ru/cat.php?deal_type=sale&engine_version=2&offer_type=flat&region=1&sort=id_user&p=1']
     # The following rule is for pagination
     rules = (
         #Rule(LinkExtractor(restrict_xpaths="//a[@class='next_page']"), follow=True),
-        Rule(LinkExtractor(allow=r"/cat\.php\?deal_type=sale&engine_version=2&offer_type=flat&p=\d+&region=1"), callback='parse_item', follow= True),
+        Rule(LinkExtractor(allow=r"/cat\.php\?deal_type=sale&engine_version=2&offer_type=flat&p=\d+&region=1&sort=id_user"), callback='parse_item', follow= True),
         #Rule(LinkExtractor(), callback='parse_item'),
     )
 
@@ -48,6 +48,7 @@ class CianSpider(CrawlSpider):
             l.add_xpath('objectType', 'td[@class="objects_item_info_col_2"]/div/a/text()')
             #one field or three?
             #square = Field()
+            l.add_xpath('squareTotal', 'td[@class="objects_item_info_col_3"]//table[@class="objects_item_props"]/tbody/tr/td/text()')
             l.add_xpath('price', 'td[@class="objects_item_info_col_4"]/div/div[@class="objects_item_price"]/strong/text()')
             l.add_xpath('floor', 'td[@class="objects_item_info_col_5"]/div[@class="objects_item_info_col_w"]/text()')
             l.add_xpath('description', 'td[@class="objects_item_info_col_9"]/div/div[@class="objects_item_info_col_comment_text no-truncate"]/text()')
