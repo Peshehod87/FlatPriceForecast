@@ -45,12 +45,16 @@ class CianSpider(CrawlSpider):
             l.add_xpath('house', 'td[@class="objects_item_info_col_1"]//div[@class="objects_item_addr"][4]/a/text()')
             #should be parsed in two: remoteness and remotenessType
             l.add_xpath('remoteness', 'td[@class="objects_item_info_col_1"]//div[@class="objects_item_metro"]/span[@class="objects_item_metro_comment"]/text()')
-            l.add_xpath('objectType', 'td[@class="objects_item_info_col_2"]/div/a/text()')
+            l.add_xpath('remotenessType', 'td[@class="objects_item_info_col_1"]//div[@class="objects_item_metro"]/span[@class="objects_item_metro_comment"]/text()')
+            l.add_xpath('roomsNumber', 'td[@class="objects_item_info_col_2"]/div/a/text()')
             #one field or three?
             #square = Field()
             l.add_xpath('squareTotal', 'td[@class="objects_item_info_col_3"]//table[@class="objects_item_props"]/tbody/tr/td/text()')
+            l.add_xpath('squareLive', 'td[@class="objects_item_info_col_3"]//table[@class="objects_item_props"]/tbody//tr/td[contains(text(),"Жилая")]/text()')
+            l.add_xpath('squareKitchen', 'td[@class="objects_item_info_col_3"]//table[@class="objects_item_props"]/tbody//tr/td[contains(text(),"Кухня")]/text()')
             l.add_xpath('price', 'td[@class="objects_item_info_col_4"]/div/div[@class="objects_item_price"]/strong/text()')
-            l.add_xpath('floor', 'td[@class="objects_item_info_col_5"]/div[@class="objects_item_info_col_w"]/text()')
+            l.add_xpath('flatFloor', 'td[@class="objects_item_info_col_5"]/div[@class="objects_item_info_col_w"]/text()')
+            l.add_xpath('floorsCount', 'td[@class="objects_item_info_col_5"]/div[@class="objects_item_info_col_w"]/text()')
             l.add_xpath('description', 'td[@class="objects_item_info_col_9"]/div/div[@class="objects_item_info_col_comment_text no-truncate"]/text()')
 
             yield l.load_item()
