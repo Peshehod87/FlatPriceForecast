@@ -75,7 +75,7 @@ class DatabaseService:
         create_district_db = ('''CREATE TABLE if not exists House
             (House_Id INT AUTO_INCREMENT Primary Key,
             Additional_Info TEXT,
-            Address TEXT,
+            Address VARCHAR(255),
             City VARCHAR(255),
             Description TEXT,
             District_Id INT,
