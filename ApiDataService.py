@@ -1,3 +1,4 @@
+import json
 import re
 import requests as rq
 import pprint as pp
@@ -75,6 +76,15 @@ class ApiDataService:
         if distr:
             return distr[0][0]
 
+    def get_geoData_point(self, cell):
+        geoData = cell['geoData']
+        if(geoData["type"] == "Polygon"):
+            return {
+            "type":"Point",
+             "coordinates": [cell['geoData']['coordinates'][0]]
+             }
+
+        return geoData
 
     def get_data(self, dataType):
         print(dataType)
@@ -84,7 +94,7 @@ class ApiDataService:
         try:
             districts = self.get_districts()
             curs = self.conn.cursor()
-            sql = f"INSERT INTO Organization ('Organization_name', 'Organization_address', 'district_id','GeoData','Type','Global_ID') VALUES (?,?,?,?,?,?)"
+            sql = f"INSERT INTO Organization (Organization_name, Organization_address, District_Id,GeoData,Object_Type,Global_ID) VALUES (%s,%s,%s,%s,%s,%s)"
             for obj in data or []:
                 cell = obj['Cells']
                 if cell['global_id'] not in globalid_list:
@@ -93,11 +103,11 @@ class ApiDataService:
                         spis = (name, 
                             self.get_address_from_cell(cell, dataType), 
                             self.get_district(cell, dataType, districts),
-                            str(cell['geoData']['coordinates'][0]),
+                            json.dumps(self.get_geoData_point(cell), ensure_ascii=False),
                             dataType.name,
                             cell['global_id'])
-                        #print(sql)
-                        #print(spis.values())
+                        print(sql)
+                        print(spis)
                         curs.execute(sql, spis)
                         globalid_list.append(cell['global_id'])                        
                 else:
