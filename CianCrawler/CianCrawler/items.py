@@ -14,12 +14,16 @@ ALL_FLOORS = 1
 def extruct_numeric(str):
     match  = re.search(r'-?\d+[,]?\d*',str)
     if(match):
-        return match.group(0)
+        return re.sub(',','.',match.group(0))
     return None
 
 def extruct_remoteness_type(str):
     strippedStr =  re.sub('\s+', ' ', str.strip())
     return re.sub(r'\d+ мин. ','',strippedStr)
+
+def get_price(str):
+    strippedStr =  re.sub(r'р\.','',str.strip())
+    return re.sub(r' ','',strippedStr)
 
 def get_floor(group):
     def process(value):
@@ -44,7 +48,7 @@ class FlatItem(Item):
     squareTotal = Field(input_processor=MapCompose(extruct_numeric))
     squareLive = Field(input_processor=MapCompose(extruct_numeric))
     squareKitchen = Field(input_processor=MapCompose(extruct_numeric))
-    price = Field(input_processor=MapCompose(lambda str: re.sub(r'р\.','',str.strip())))
+    price = Field(input_processor=MapCompose(get_price))
     flatFloor = Field(input_processor=MapCompose(get_floor(FLAT_FLOOR)))
     floorsCount = Field(input_processor=MapCompose(get_floor(ALL_FLOORS)))
     description = Field()

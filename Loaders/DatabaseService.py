@@ -79,13 +79,11 @@ class DatabaseService:
             City VARCHAR(255),
             Description TEXT,
             District_Id INT,
-            House VARCHAR(10),
+            House VARCHAR(50),
             Remoteness SMALLINT,
             Remoteness_Type VARCHAR(50),
             Street VARCHAR(100),
-            Subway_Id INT,
             GeoData JSON,
-            FOREIGN KEY (Subway_Id) REFERENCES Subway(Subway_Id) ON DELETE CASCADE,
             FOREIGN KEY (District_Id) REFERENCES District(District_Id) ON DELETE CASCADE);''')
         c.execute(create_district_db)
         self.conn.commit()
@@ -106,35 +104,3 @@ class DatabaseService:
         self.create_organization_table()
         self.create_house_table()
         self.create_flat_table()
-
-    def fill_districts(self):
-        curs = self.conn.cursor()
-        i = 0
-        sql = f"INSERT INTO District (DISTRICT_NAME) VALUES (%s)"
-        
-        with open(self.DISTRICT_FILE, encoding="utf-8") as json_file:
-            json_data = json.load(json_file)
-
-        try:
-            for district in json_data["districts"]:
-                curs.execute(sql, (district,))
-
-            self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
-            raise e
-        finally:
-            curs.close()
-            self.conn.close()
-
-
-    def fill_subway(self):
-        curs = self.conn.cursor()
-        i = 0
-        sql = f"INSERT INTO Subway (Subway_Name) VALUES (%s)"
-        
-        with open(self.SUBWAY_FILE,'r', encoding="utf-8") as csv_file:
-            reader = csv.reader(csv_file, delimiter=',')
-            for row in reader:
-                print(row)
-                curs.execute(sql, (row[0],))

@@ -3,10 +3,12 @@ import re
 import requests as rq
 import pprint as pp
 from constants import OrganizationType, CHILD_CLINIC, ADULT_CLINIC, SCHOOLS, MALL
+from UtilsService import UtilsService
 
 class ApiDataService:
     def __init__(self, connection):
         self.conn = connection
+        self.utils = UtilsService(connection)
 
     def moscow_data(self, url):
         result = rq.get(url)
@@ -27,13 +29,6 @@ class ApiDataService:
 
         if dataType is OrganizationType.MALL:
             return self.moscow_data(MALL)
-
-    def get_districts(self):
-        curs = self.conn.cursor()
-        curs.execute("SELECT * FROM DISTRICT")
-        rows = curs.fetchall()
-        curs.close()
-        return rows
 
     def get_name_from_cell(self, cell, dataType):
         if dataType is OrganizationType.MALL:
@@ -67,14 +62,12 @@ class ApiDataService:
         if dataType is OrganizationType.MALL:
             return cell['District']
 
-    def get_district(self, cell, dataType, districts):
+    def get_district(self, cell, dataType):
         objectDistr = self.get_district_from_cell(cell, dataType)
      
         objectDistr = re.sub('район', '', objectDistr).strip()
 
-        distr = list(filter(lambda person: person[1] == objectDistr, districts))
-        if distr:
-            return distr[0][0]
+        return self.utils.get_district_id(objectDistr)
 
     def get_geoData_point(self, cell):
         geoData = cell['geoData']
@@ -92,7 +85,6 @@ class ApiDataService:
         globalid_list=[]
         print("data recived")
         try:
-            districts = self.get_districts()
             curs = self.conn.cursor()
             sql = f"INSERT INTO Organization (Organization_name, Organization_address, District_Id,GeoData,Object_Type,Global_ID) VALUES (%s,%s,%s,%s,%s,%s)"
             for obj in data or []:
@@ -102,7 +94,7 @@ class ApiDataService:
                     if name != None:
                         spis = (name, 
                             self.get_address_from_cell(cell, dataType), 
-                            self.get_district(cell, dataType, districts),
+                            self.get_district(cell, dataType),
                             json.dumps(self.get_geoData_point(cell), ensure_ascii=False),
                             dataType.name,
                             cell['global_id'])
