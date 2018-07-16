@@ -41,9 +41,9 @@ if __name__ == "__main__":
     ld.fill_all()
     #ld.fill_CIAN_data()
     #conn = get_conn()
-    loader = ApiDataService(conn)
-    print("get_all started")
-    loader.get_all()
+    #loader = ApiDataService(conn)
+    #print("get_all started")
+    #loader.get_all()
 
     #conn = get_conn()
     #c = conn.cursor()

@@ -1,4 +1,5 @@
 import re
+import requests as rq
 
 class UtilsService:
 
@@ -36,3 +37,26 @@ class UtilsService:
         sub = list(filter(lambda obj: obj[1] == subwayName, self.subways))
         if sub:
             return sub[0][0]
+
+    def getJSON(self, address):
+        YandexApi = rq.get("http://geocode-maps.yandex.ru/1.x/"+"?format=json&geocode=%s" % (address))
+        if YandexApi.status_code == 200:
+            return YandexApi.json()
+        else:
+            print('Error: {} from server'.format(result.status_code))
+
+    def listGeoObject(self, address):
+        response = self.getJSON(address)
+
+        if response['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']['found']:
+            if(len(response['response']['GeoObjectCollection']['featureMember']) == 1):
+                coord = [ float(c) for c in response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split(' ')]    
+                return {
+                    "type": "Point",
+                    "coordinates": coord
+                }
+            else:
+                #get 'precision': 'exact', 
+                print(response)
+            #item['GeoObject']['Point']['pos'] for item in response['response']['GeoObjectCollection']['featureMember']
+            #['Point']#['pos'])

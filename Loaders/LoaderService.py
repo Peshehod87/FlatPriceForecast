@@ -77,7 +77,7 @@ class LoaderService:
                 row["remoteness"] if row["remoteness"].isdigit() else None, 
                 row["remotenessType"],
                 row["street"])
-
+            print(json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
             curs.execute(house_insert_sql, house_elem)
             curs.execute('''SELECT LAST_INSERT_ID()''')
             house_id = curs.fetchone()
