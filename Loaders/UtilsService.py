@@ -49,14 +49,22 @@ class UtilsService:
         response = self.getJSON(address)
 
         if response['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']['found']:
-            if(len(response['response']['GeoObjectCollection']['featureMember']) == 1):
-                coord = [ float(c) for c in response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split(' ')]    
-                return {
-                    "type": "Point",
-                    "coordinates": coord
-                }
-            else:
+            featureMembers = response['response']['GeoObjectCollection']['featureMember']
+            
+            try:
+                match = next(addr for addr in featureMembers  if addr['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] == 'exact')
+            except StopIteration  as e:
+                #print(address)
+                #print(featureMembers)
+                match = featureMembers[0]
+            
+            coord = [ float(c) for c in match['GeoObject']['Point']['pos'].split(' ')]    
+            return {
+                "type": "Point",
+                "coordinates": coord
+            }
+            #else:
                 #get 'precision': 'exact', 
-                print(response)
+                #print(response)
             #item['GeoObject']['Point']['pos'] for item in response['response']['GeoObjectCollection']['featureMember']
             #['Point']#['pos'])

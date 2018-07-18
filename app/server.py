@@ -12,7 +12,6 @@ def hello_world():
 @app.route('/map')
 def map():
     Map = mapService.get_map()
-    print(Map)
     return Map.get_root().render()
 
 if __name__ == '__main__':
