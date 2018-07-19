@@ -54,8 +54,6 @@ class UtilsService:
             try:
                 match = next(addr for addr in featureMembers  if addr['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] == 'exact')
             except StopIteration  as e:
-                #print(address)
-                #print(featureMembers)
                 match = featureMembers[0]
             
             coord = [ float(c) for c in match['GeoObject']['Point']['pos'].split(' ')]    
@@ -63,8 +61,3 @@ class UtilsService:
                 "type": "Point",
                 "coordinates": coord
             }
-            #else:
-                #get 'precision': 'exact', 
-                #print(response)
-            #item['GeoObject']['Point']['pos'] for item in response['response']['GeoObjectCollection']['featureMember']
-            #['Point']#['pos'])

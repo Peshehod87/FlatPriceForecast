@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Карта для понимания</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  </head>
+  <body>
+	<div class="row-container">
+		<div class="first-row">
+			<span class="filter-span">Фильтрация по типу объектов:</span>
+		</div>
+  		<div class="first-row">
+			<form action='/get_selected_types' method='POST' id='submitform' class="submit-form">
+                <!--div class="checkbox">
+                  <label><input type="checkbox" name="check" value="1">1</label>
+                </div>
+                <div class="checkbox">
+                  <label><input type="checkbox" name="check" value="2">2</label>
+                </div>
+                <div class="checkbox">
+                  <label><input type="checkbox" name="check" value="3">3</label>
+                </div>
+                <div class="checkbox">
+                  <label><input type="checkbox" name="check" value="4">4</label>
+                </div>
+                <div class="checkbox">
+                  <label><input type="checkbox" name="check" value="5">5+</label>
+                </div -->
+
+                {% for item in checks %}
+                <label class="checkbox-label">
+                	<input class="input-checkbox" type="checkbox" value='{{item.type}}' name="selectedTypes" {{'checked="checked"' if item.isChecked else ""}}> 
+                	{{item.display}}
+               	</label>
+                {% endfor %}
+                <div>
+                	<button type="submit" class="btn btn-success">Показать</button>
+            	</div>
+             </form>
+		</div>
+	    <iframe src="{{ url_for('map', currentTypes=currentTypes) }}" class="second-row"></iframe>   
+	</div>
+  </body>
+</html>

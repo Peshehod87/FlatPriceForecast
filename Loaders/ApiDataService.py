@@ -2,7 +2,8 @@ import json
 import re
 import requests as rq
 import pprint as pp
-from constants import OrganizationType, CHILD_CLINIC, ADULT_CLINIC, SCHOOLS, MALL
+from settings import OrganizationType, CHILD_CLINIC, ADULT_CLINIC, SCHOOLS, MALL
+#from FlatPriceForecast.global_constants import OrganizationType
 from UtilsService import UtilsService
 
 class ApiDataService:
@@ -71,11 +72,11 @@ class ApiDataService:
 
     def get_geoData_point(self, cell):
         geoData = cell['geoData']
-        if(geoData["type"] == "Polygon"):
-            return {
-            "type":"Point",
-             "coordinates": [cell['geoData']['coordinates'][0]]
-             }
+        #if(geoData["type"] == "Polygon"):
+        #    return {
+        #    "type":"Point",
+        #     "coordinates": [cell['geoData']['coordinates'][0]]
+        #     }
 
         return geoData
 
@@ -98,8 +99,6 @@ class ApiDataService:
                             json.dumps(self.get_geoData_point(cell), ensure_ascii=False),
                             dataType.name,
                             cell['global_id'])
-                        print(sql)
-                        print(spis)
                         curs.execute(sql, spis)
                         globalid_list.append(cell['global_id'])                        
                 else:

@@ -69,15 +69,17 @@ class LoaderService:
             House,
             Remoteness,
             Remoteness_Type,
-            Street) 
-            VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s)'''
+            Street,
+            GeoData) 
+            VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s,%s)'''
             house_elem = (row["additionalInfo"], row["address"], row["city"], row["description"], 
                 self.utils.get_district_id(row["district"]), 
                 row["house"], 
                 row["remoteness"] if row["remoteness"].isdigit() else None, 
                 row["remotenessType"],
-                row["street"])
-            print(json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
+                row["street"],
+                json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
+            #print(json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
             curs.execute(house_insert_sql, house_elem)
             curs.execute('''SELECT LAST_INSERT_ID()''')
             house_id = curs.fetchone()
