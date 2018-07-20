@@ -32,6 +32,10 @@ class MapService:
             self.addHousesMarkers(m)
             print("House markers added")
 
+        if(ShowOnMap.SUBWAY.value in options):
+            self.addSubwayMarkers(m)
+            print("Subway markers added")
+
         return m
 
     def addOrganizationMarkers(self, currentMap, orgType):
@@ -44,10 +48,10 @@ class MapService:
         houses = self.dataService.getHouses()
         for h in houses:
             for c in h.coordinatesToLatLng():
-                folium.Marker(c, popup=h.address, icon=h.getIcon()).add_to(currentMap)
+                folium.Marker(c, popup=h.getPopup(), icon=h.getIcon()).add_to(currentMap)
 
-    def getSchools(self):
-        return self.dataService.getOrganization(OrganizationType.SCHOOL)
-
-    def getMalls(self):
-        return self.dataService.getOrganization(OrganizationType.MALL)
+    def addSubwayMarkers(self, currentMap):
+        subways = self.dataService.getSubways()
+        for s in subways:
+            for c in s.coordinatesToLatLng():
+                folium.Marker(c, popup=s.name, icon=s.getIcon()).add_to(currentMap)

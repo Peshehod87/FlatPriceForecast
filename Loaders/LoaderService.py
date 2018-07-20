@@ -31,15 +31,31 @@ class LoaderService:
         finally:
             curs.close()
 
+    def convert_coordinate_to_decimal(self, coordStr):
+        #55°48′14″
+        m = re.findall('\d{2}',coordStr)
+        print(m)
+        return float(m[0])+(float(m[1])/60)+(float(m[2])/3600)
+
+    def get_subway_geoJson(self, subwayCoordinatesStr):
+        coordinates = [ self.convert_coordinate_to_decimal(c)  for c in subwayCoordinatesStr.split()]
+        return {
+            "type": "Point",
+            "coordinates":[coordinates[1],coordinates[0]]
+        }
 
     def fill_subway(self):
         curs = self.conn.cursor()
-        sql = f"INSERT INTO Subway (Subway_Name) VALUES (%s)"
+        sql = f"INSERT INTO Subway (Subway_Name, GeoData) VALUES (%s,%s)"
         try:
             with open(self.SUBWAY_FILE,'r', encoding="utf-8") as csv_file:
-                reader = csv.reader(csv_file, delimiter=',')
+                #reader = csv.reader(csv_file, delimiter=',')
+                reader = csv.DictReader(csv_file)
                 for row in reader:
-                    curs.execute(sql, (row[0],))
+                    print(row)
+                    curs.execute(sql, (row["name"], 
+                                        json.dumps(self.get_subway_geoJson(row["coordinates"]), ensure_ascii=False))
+                                )
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
@@ -58,31 +74,28 @@ class LoaderService:
     def get_house(self, row):
         address = row["address"]
         curs = self.conn.cursor()
-        curs.execute("SELECT house_id FROM House WHERE address = %s", (address,))
+        house_insert_sql = '''INSERT INTO House (Additional_Info,
+        Address,
+        City,
+        Description,
+        District_Id,
+        House,
+        Remoteness,
+        Remoteness_Type,
+        Street,
+        GeoData) 
+        VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+        house_elem = (row["additionalInfo"], row["address"], row["city"], row["description"], 
+            self.utils.get_district_id(row["district"]), 
+            row["house"], 
+            row["remoteness"] if row["remoteness"].isdigit() else None, 
+            row["remotenessType"],
+            row["street"],
+            json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
+        #print(json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
+        curs.execute(house_insert_sql, house_elem)
+        curs.execute('''SELECT LAST_INSERT_ID()''')
         house_id = curs.fetchone()
-        if house_id is None:
-            house_insert_sql = '''INSERT INTO House (Additional_Info,
-            Address,
-            City,
-            Description,
-            District_Id,
-            House,
-            Remoteness,
-            Remoteness_Type,
-            Street,
-            GeoData) 
-            VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s,%s)'''
-            house_elem = (row["additionalInfo"], row["address"], row["city"], row["description"], 
-                self.utils.get_district_id(row["district"]), 
-                row["house"], 
-                row["remoteness"] if row["remoteness"].isdigit() else None, 
-                row["remotenessType"],
-                row["street"],
-                json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
-            #print(json.dumps(self.utils.listGeoObject(row["address"]), ensure_ascii=False))
-            curs.execute(house_insert_sql, house_elem)
-            curs.execute('''SELECT LAST_INSERT_ID()''')
-            house_id = curs.fetchone()
 
         return house_id[0]
 
@@ -101,12 +114,13 @@ class LoaderService:
             with open(self.CIAN_FILE,'r', encoding="utf-8") as csv_file:
                 #reader = csv.reader(csv_file, delimiter=',')
                 reader = csv.DictReader(csv_file,  delimiter=',')
+                house_dictionary = {}
                 for row in reader:
                     #print(row)
                     if row["address"] is None or row["address"] == '':
                         continue
 
-                    house_id = self.get_house(row)
+                    house_id = house_dictionary[row["address"]] if row["address"] in house_dictionary else self.insert_house(row)
                     flat_elem = (row["flatFloor"], row["floorsCount"], house_id, 
                         self.get_price(row),
                         row["roomsNumber"] if row["roomsNumber"].isdigit() else None,

@@ -1,0 +1,29 @@
+<br>{{address}}<br>
+<table>
+  <thead>
+    <th>Тип</th>
+    <th>Этаж</th>
+    <th>Цена</th>
+    <th>Общая площадь</th>
+    <th>Жилая площадь</th>
+    <th>Кухня</th>
+  </thead>
+  <tbody>
+    {% for f in flats %}
+    <tr>
+      <td>
+      	{% if f.rooms is not none %}   
+	    	{{ f.rooms }}-х комн.
+		{% else %}
+		    -
+		{%endif %}
+      </td>
+      <td>{{ f.floor }} из {{ f.floors_count }}</td>
+      <td>{{ f.price }} p.</td>
+      <td>{{ f.square if f.square != None else '-' }}</td>
+      <td>{{ f.square_live if f.square_live != None else '-'}}</td>
+      <td>{{ f.square_kitchen if f.square_kitchen != None else '-'}}</td>
+     </tr>
+   {% endfor %}
+  </tbody>
+</table>

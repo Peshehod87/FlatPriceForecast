@@ -1,6 +1,7 @@
 import mysql.connector as mq
 from Models.Organization import Organization
-from Models.House import House
+from Models.House import House, Flat
+from Models.Subway import Subway
 
 class DataService:
     organization_sql_select = '''
@@ -10,8 +11,15 @@ class DataService:
     '''
 
     house_sql_select = '''
-    SELECT Address, GeoData
-    FROM House
+    SELECT h.House_id, h.Address, h.GeoData, 
+    f.Flat_Floor, f.Floors_count, f.Price, f.Rooms_Number, f.Square_Total, f.Square_Live, f.Square_Kitchen
+    FROM House h
+    INNER JOIN Flat f on f.House_id = h.House_id
+    '''
+
+    subway_sql_select = '''
+    SELECT SubWay_Name, GeoData
+    FROM Subway
     '''
 
     def create_mysql_connection(self):
@@ -38,14 +46,37 @@ class DataService:
 
     def getHouses(self):
         conn = self.create_mysql_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         cursor.execute(self.house_sql_select)
         results = cursor.fetchall()
-        houseList = []
+        house_dictionary = {}
         for row in results:
-            house = House()
-            house.address = row[0]
-            house.setGeoJson(row[1])
-            houseList.append(house)
+            house_id = row["House_id"]
+            if house_id in house_dictionary:
+                house = house_dictionary[house_id] 
+            else: 
+                house = House(house_id, row["Address"], row["GeoData"])            
+                house_dictionary[house_id] = house
+            flat = Flat(row["Rooms_Number"], 
+                row["Flat_Floor"], 
+                row["Floors_count"],
+                row["Price"],
+                row["Square_Total"], 
+                row["Square_Live"], 
+                row["Square_Kitchen"])
+            house.flats.append(flat)
+        return list(house_dictionary.values())
 
-        return houseList
+    def getSubways(self):
+        conn = self.create_mysql_connection()
+        cursor = conn.cursor()
+        cursor.execute(self.subway_sql_select)
+        results = cursor.fetchall()
+        subwayList = []
+        for row in results:
+            subway = Subway()
+            subway.name = row[0]
+            subway.setGeoJson(row[1])
+            subwayList.append(subway)
+
+        return subwayList

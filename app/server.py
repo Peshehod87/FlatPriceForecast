@@ -49,7 +49,7 @@ def getChecks(currentTypes):
         { "type": ShowOnMap.SCHOOL.value, "display": "Школы", "isChecked": currentTypes is not None and ShowOnMap.SCHOOL.value in convertedTypes },
         { "type": ShowOnMap.CHILD_CLINIC.value, "display": "Детские поликлиники", "isChecked": currentTypes is not None and ShowOnMap.CHILD_CLINIC.value in convertedTypes },
         { "type": ShowOnMap.ADULT_CLINIC.value, "display": "Поликлиники", "isChecked": currentTypes is not None and ShowOnMap.ADULT_CLINIC.value in convertedTypes },
-       # { "type": ShowOnMap.SUBWAY.value, "display": "Метро", "isChecked": currentTypes is not None and ShowOnMap.SUBWAY.value in convertedTypes }
+        { "type": ShowOnMap.SUBWAY.value, "display": "Метро", "isChecked": currentTypes is not None and ShowOnMap.SUBWAY.value in convertedTypes }
     ]
     return checks
 
